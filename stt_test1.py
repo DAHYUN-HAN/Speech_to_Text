@@ -15,54 +15,85 @@ import numpy as np
 RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
 
-script = ['아주 멀리까지 가 보고 싶어',
-          '그곳에선 누구를 만날 수가 있을지',
-          '아주 높이까지 오르고 싶어',
-          '얼마나 더 먼 곳을 바라볼 수 있을지',
-          '작은 물병 하나, 먼지 낀 카메라',
-          '때 묻은 지도 가방 안에 넣고서',
+script_data = [' ',
+               ' ',
+               ' ',
+               ' ',
+               ' ',
+    
+               '동해물과 백두산이 마르고 닳도록',
+               '하느님이 보우하사 우리나라 만세',
+               '무궁화 삼천리 화려 강산',
+               '대한 사람 대한으로 길이 보전하세',
+               '남산 위에 저 소나무 철갑을 두른 듯',
+               '바람 서리 불변함은 우리 기상일세',
 
-          '언덕을 넘어 숲길을 헤치고',
-          '가벼운 발걸음 닿는 대로',
-          '끝없이 이어진 길을 천천히 걸어가네',
-
-
-          '멍하니 앉아서 쉬기도 하고',
-          '가끔 길을 잃어도 서두르지 않는 법',
-          '언젠가는 나도 알게 되겠지',
-          '이 길이 곧 나에게 가르쳐 줄 테니까',
-
-          '촉촉한 땅바닥 앞서 간 발자국',
-          '처음 보는 하늘 그래도 낯익은 길',
-
-          '언덕을 넘어 숲길을 헤치고',
-          '가벼운 발걸음 닿는 대로',
-          '끝없이 이어진 길을 천천히 걸어가네',
+               '가을 하늘 공활한데 높고 구름 없이',
+               '밝은 달은 우리 가슴 일편단심일세',
+               '이 기상과 이 맘으로 충성을 다하여',
 
 
-          '새로운 풍경에 가슴이 뛰고',
-          '별것 아닌 일에도 호들갑을 떨면서',
-          '나는 걸어가네 휘파람 불며',
-          '때로는 넘어져도 내 길을 걸어가네',
+               '괴로우나 즐거우나 나라 사랑하세',
+               '아름다운 이 땅에 금수강산에',
+               '단군할아버지가 터잡으시고',
+               '홍익인간 뜻으로 나라세우니',
 
-          '작은 물병 하나 먼지 낀 카메라',
-          '때 묻은 지도 가방 안에 넣고서',
-
-          '언덕을 넘어 숲길을 헤치고',
-          '가벼운 발걸음 닿는 대로',
-          '끝없이 이어진 길을 천천히 걸어가네',
-
-          '내가 자라고 정든 이 거리를',
-          '난 가끔 그리워하겠지만',
-          '이렇게 나는 떠나네 더 넓은 세상으로']
+               '대대손손 훌륭한 인물도 많아',
+               '고구려세운 동명왕 백제 온조왕',
+               '알에서 나온 혁거세',
+               '만주벌판 달려라 광개토대왕 신라장군 이사부',
+               '백결선생 떡방아 삼천궁녀 의자왕',
+               '황산벌의 계백 맞서 싸운 관창',
+               '역사는 흐른다',
+               '말목자른 김유신 통일 문무왕',
+               '원효대사 해골물 혜초천축국',
+               '바다의왕자 장보고 발해 대조영',
+               '귀주대첩 강감찬 서희 거란족',
+               '무단 정치 정중부 화포 최무선',
+               '죽림칠현 김부식',
+               
+               '지눌국사 조계종 의천 천태종',
+               '대마도정벌 이종무',
+               '일편단심 정몽주 목화씨는 문익점',
+               '해동공자 최충 삼국유사 일연',
+               '황금을 보기를 돌같이하라',
+               '최영 장군의 말씀 받들자',
+               '황희 정승 맹사성 과학 장영실',
+               '신숙주와 한명회 역사는 안다',
+               '십만 양병 이율곡 주리 이퇴계',
+               '신사임당 오죽헌',
+               '잘싸운다 곽재우 조헌 김시민',
+               '나라구한 이순신',
+               '태정태세문단세 사육신과 생육신',
+               '몸바쳐서 논개 행주치마 권율',
+               '번쩍번쩍 홍길동 의적 임꺽정',
+               '대쪽같은 삼학사 어사 박문수',
+               '삼년 공부 한석봉 단원 풍속도',
+               '방랑시인 김삿갓 지도 김정호',
+               '영조대왕 신문고 정조 규장각',
+               '목민심서 정약용',
+               '녹두장군 전봉준 순교 김대건',
+               '서화가무 황진이',
+               '못살겠다 홍경래 삼일천하 김옥균',
+               '안중근은 애국 이왕용은 매국',
+               '별헤는 밤 윤동주 종두 지석영',
+               '삼십삼인 손병희',
+               '만세만세 유관순 도산 안창호',
+               '어린이날 방정환',
+               '이수일과 심순애 장군의 아들 김두한',
+               '날자꾸나 이상 황소그림 중섭',
+               ' ',
+               ' ',
+               ' ',
+               ' ',
+               ' '
+         ]
 
 class MicrophoneStream(object):
-    """Opens a recording stream as a generator yielding the audio chunks."""
     def __init__(self, rate, chunk):
         self._rate = rate
         self._chunk = chunk
 
-        # Create a thread-safe buffer of audio data
         self._buff = queue.Queue()
         self.closed = True
 
@@ -70,13 +101,8 @@ class MicrophoneStream(object):
         self._audio_interface = pyaudio.PyAudio()
         self._audio_stream = self._audio_interface.open(
             format=pyaudio.paInt16,
-            # The API currently only supports 1-channel (mono) audio
-            # https://goo.gl/z757pE
             channels=1, rate=self._rate,
             input=True, frames_per_buffer=self._chunk,
-            # Run the audio stream asynchronously to fill the buffer object.
-            # This is necessary so that the input device's buffer doesn't
-            # overflow while the calling thread makes network requests, etc.
             stream_callback=self._fill_buffer,
         )
 
@@ -88,27 +114,20 @@ class MicrophoneStream(object):
         self._audio_stream.stop_stream()
         self._audio_stream.close()
         self.closed = True
-        # Signal the generator to terminate so that the client's
-        # streaming_recognize method will not block the process termination.
         self._buff.put(None)
         self._audio_interface.terminate()
 
     def _fill_buffer(self, in_data, frame_count, time_info, status_flags):
-        """Continuously collect data from the audio stream, into the buffer."""
         self._buff.put(in_data)
         return None, pyaudio.paContinue
 
     def generator(self):
         while not self.closed:
-            # Use a blocking get() to ensure there's at least one chunk of
-            # data, and stop iteration if the chunk is None, indicating the
-            # end of the audio stream.
             chunk = self._buff.get()
             if chunk is None:
                 return
             data = [chunk]
 
-            # Now consume whatever other data's still buffered.
             while True:
                 try:
                     chunk = self._buff.get(block=False)
@@ -120,54 +139,39 @@ class MicrophoneStream(object):
 
             yield b''.join(data)
 
-def listen_print_loop(responses):
-    """Iterates through server responses and prints them.
-
-    The responses passed is a generator that will block until a response
-    is provided by the server.
-
-    Each response may contain multiple results, and each result may contain
-    multiple alternatives; for details, see https://goo.gl/tjCPAU.  Here we
-    print only the transcription for the top alternative of the top result.
-
-    In this case, responses are provided for interim results as well. If the
-    response is an interim one, print a line feed at the end of it, to allow
-    the next result to overwrite it, until the response is a final one. For the
-    final one, print a newline to preserve the finalized transcription.
-    """
+def listen_print_loop(responses, First):
+    if(First):
+       
+        present_point = 5
+        First = False
+        
     num_chars_printed = 0
     for response in responses:
+        
         if not response.results:
             continue
 
-        # The `results` list is consecutive. For streaming, we only care about
-        # the first result being considered, since once it's `is_final`, it
-        # moves on to considering the next utterance.
         result = response.results[0]
         if not result.alternatives:
             continue
 
-        # Display the transcription of the top alternative.
         transcript = result.alternatives[0].transcript
 
-        # Display interim results, but with a carriage return at the end of the
-        # line, so subsequent lines will overwrite them.
-        #
-        # If the previous result was longer than this one, we need to print
-        # some extra spaces to overwrite the previous result
-        overwrite_chars = ' ' * (num_chars_printed - len(transcript))
+        overwrite_chars = ' ' * (20)
 
         if not result.is_final:
-            sys.stdout.write(transcript + overwrite_chars + '\r')
+            present_point, ratio = similarity3(script_data[present_point-5:present_point+5], transcript + overwrite_chars,present_point)
+            sys.stdout.write("현재 대본: " + script_data[present_point] + " " + str(ratio)+overwrite_chars +'\r')
+#             sys.stdout.write(transcript + overwrite_chars + '\r')
             sys.stdout.flush()
-
+            
             num_chars_printed = len(transcript)
+            
+#             present_point = similarity2(script_data[present_point-5:present_point+5], transcript + overwrite_chars,present_point)
 
         else:
-            print(transcript + overwrite_chars)
+            #print(transcript + overwrite_chars)
 
-            # Exit recognition if any of the transcribed phrases could be
-            # one of our keywords.
             if re.search(r'\b(exit|quit)\b', transcript, re.I):
                 print('Exiting..')
                 break
@@ -175,41 +179,61 @@ def listen_print_loop(responses):
             num_chars_printed = 0
             
             present_sentence = transcript + overwrite_chars
-            similarity(present_sentence)
+            present_point = similarity2(script_data[present_point-5:present_point+6], transcript + overwrite_chars,present_point)
 
             
-def similarity(present_sentence):
+def similarity(script, present_sentence, present_point):
+    print('present_sentence', present_sentence)
+    print('present_point', present_point)
     present_sentence = present_sentence.replace(" ", "")
-    present_sentence = present_sentence.replace(".", "")
     ratio = []
     for i in range(len(script)):
         script_sentence = script[i].replace(" ", "")
-        script_sentence = script[i].replace(".", "")
+        script_sentence = script_sentence.replace(".", "")
     
         ratio.append(SequenceMatcher(None, present_sentence, script_sentence).ratio())
+    #경험적으로, ratio() 값이 0.6 이상이면 시퀀스가 근접하게 일치함을 뜻합니다:
     print('현재 대본: ', script[np.argmax(ratio)], np.max(ratio))
+    return np.argmax(ratio) +  present_point - 5
     
     
-def similarity(present_sentence):
+    
+def similarity2(script, present_sentence, present_point):
+#     print('present_point', present_point)
+#     print('present_sentence', present_sentence)
     present_sentence = present_sentence.replace(" ", "")
     present_sentence = present_sentence.replace(".", "")
     ratio = []
     for i in range(len(script)):
         script_sentence = script[i].replace(" ", "")
-        script_sentence = script[i].replace(".", "")
+        script_sentence = script_sentence.replace(".", "")
     
         ratio.append(SequenceMatcher(None, present_sentence, script_sentence).ratio())
-    
-    if(np.max(ratio) > 0.5):
-        print('현재 대본: ', script[np.argmax(ratio)], np.max(ratio))
+    #경험적으로, ratio() 값이 0.6 이상이면 시퀀스가 근접하게 일치함을 뜻합니다:
+    if(np.max(ratio) > 0.4):
+        print('현재 대본: ', script[np.argmax(ratio)], np.max(ratio) ,"                                           ")
+        return np.argmax(ratio) + present_point - 5
     else:
-        print('대본에 없음')
-
+        print('현재 대본 : 없음                                                       ')
+        return present_point
+    
+def similarity3(script, present_sentence, present_point):
+    present_sentence = present_sentence.replace(" ", "")
+    present_sentence = present_sentence.replace(".", "")
+    ratio = []
+    for i in range(len(script)):
+        script_sentence = script[i].replace(" ", "")
+        script_sentence = script_sentence.replace(".", "")
+    
+        ratio.append(SequenceMatcher(None, present_sentence, script_sentence).ratio())
+    #경험적으로, ratio() 값이 0.6 이상이면 시퀀스가 근접하게 일치함을 뜻합니다:
+    if(np.max(ratio) > 0.4):
+        return np.argmax(ratio) + present_point - 5, np.max(ratio)
+    else:
+        return present_point, np.max(ratio)
 
 def main():
-    # See http://g.co/cloud/speech/docs/languages
-    # for a list of supported languages.
-    language_code = 'ko-KR'  # a BCP-47 language tag
+    language_code = 'ko-KR'
     client = speech.SpeechClient()
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
@@ -218,7 +242,7 @@ def main():
     streaming_config = speech.StreamingRecognitionConfig(
         config=config,
         interim_results=True)
-
+    
     with MicrophoneStream(RATE, CHUNK) as stream:
         audio_generator = stream.generator()
         requests = (speech.StreamingRecognizeRequest(audio_content=content)
@@ -226,8 +250,7 @@ def main():
 
         responses = client.streaming_recognize(streaming_config, requests)
 
-        # Now, put the transcription responses to use.
-        listen_print_loop(responses)
+        listen_print_loop(responses, First = True)
 
 if __name__ == '__main__':
     main()
