@@ -8,8 +8,10 @@ from google.cloud import speech
 import pyaudio
 from six.moves import queue
 from difflib import SequenceMatcher
+from matplotlib import pyplot as plt
 
 import numpy as np
+import time
 
 # Audio recording parameters
 RATE = 16000
@@ -65,58 +67,81 @@ class MicrophoneStream(object):
 
             yield b''.join(data)
 
-def listen_print_loop(responses, First):
+def listen_print_loop(responses, present_point):
+    print("listen_print_loop 들어옴")
+    start = time.time()
+    result_list = []
     
-#     if(First):
-       
-#         present_point = 5
-#         First = False
-
-    present_point = 5
-    
-    with open('conti_script_compare.txt', 'r') as f:
+    with open('script.txt', 'r') as f:
         data = f.read()
     script_data = data.splitlines()
     
-    with open('conti_script_print.txt', 'r') as f:
+    with open('script.txt', 'r') as f:
         data = f.read()
-    script_original = data.splitlines()
+    print_script = data.splitlines()
         
     num_chars_printed = 0
+    
     for response in responses:
-        
-        if not response.results:
-            continue
+        if(time.time()-start < 250):
+            if not response.results:
+                continue
 
-        result = response.results[0]
-        if not result.alternatives:
-            continue
+            result = response.results[0]
+            if not result.alternatives:
+                continue
 
-        transcript = result.alternatives[0].transcript
+            transcript = result.alternatives[0].transcript
 
-        overwrite_chars = ' ' * (20)
+            overwrite_chars = ' ' * (20)
 
-        if not result.is_final:
-            present_point, ratio = similarity3(script_data[present_point-5:present_point+6], transcript + overwrite_chars,present_point)
-            sys.stdout.write("현재 대본: " + script_original[present_point] + " " + str(ratio)+overwrite_chars +'\r')
-#             sys.stdout.write(transcript + overwrite_chars + '\r')
-            sys.stdout.flush()
-            
-            num_chars_printed = len(transcript)
-            
-#             present_point = similarity2(script_data[present_point-5:present_point+5], transcript + overwrite_chars,present_point)
+            if not result.is_final:
+    #             present_point, ratio = similarity3(script_data[present_point-5:present_point+6], transcript + overwrite_chars,present_point)
+                result_list.append(similarity4(script_data[present_point-5:present_point+6], transcript + overwrite_chars,present_point))
+                print(transcript)
+                present_point = np.argmax(result_list[-1]) + present_point - 5
 
+                if(present_point < 5):
+                    present_point = 5
+
+                name = print_script[present_point]
+
+    #            sys.stdout.write("현재 대본: " + name +'\r')
+    #             sys.stdout.write("현재 대본: " + script_data[present_point] + " " + str(ratio)+overwrite_chars +'\r')
+    #             sys.stdout.write(transcript + overwrite_chars + '\r')
+    #             sys.stdout.flush()
+
+                num_chars_printed = len(transcript)
+
+    
+            else:
+                #print(transcript + overwrite_chars)
+
+                with open('ratio.txt', 'a') as f:
+                    f.writelines(name+"\n")
+                    for line in result_list:
+                        f.writelines(str(line)+'\n')
+                    
+                plt.clf()
+                plt.plot(result_list)
+                plt.legend(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], bbox_to_anchor=(1, 1))
+                plt.savefig('similarity_graph/'+str(present_point) + name+'.png')
+                
+                if re.search(r'\b(exit|quit)\b', transcript, re.I):
+                    print('Exiting..')
+                    break
+
+                num_chars_printed = 0
+
+                present_sentence = transcript + overwrite_chars
+                present_point = similarity2(script_data[present_point-5:present_point+6], transcript + overwrite_chars,present_point)
+                print_script[present_point] = "공백"
+                with open('script_after_run.txt', 'w') as f:
+                    for line in print_script:
+                        f.writelines(str(line)+'\n')
+                result_list = []
         else:
-            #print(transcript + overwrite_chars)
-
-            if re.search(r'\b(exit|quit)\b', transcript, re.I):
-                print('Exiting..')
-                break
-
-            num_chars_printed = 0
-            
-            present_sentence = transcript + overwrite_chars
-            present_point = similarity2(script_data[present_point-5:present_point+6], script_original[present_point-5:present_point+6], transcript + overwrite_chars,present_point)
+            return present_point
 
             
 def similarity(script, present_sentence, present_point):
@@ -134,34 +159,51 @@ def similarity(script, present_sentence, present_point):
     return np.argmax(ratio) +  present_point - 5
     
     
-    
-def similarity2(script, script_original, present_sentence, present_point):
+def similarity2(script, present_sentence, present_point):
 #     print('present_point', present_point)
 #     print('present_sentence', present_sentence)
     present_sentence = present_sentence.replace(" ", "")
     present_sentence = present_sentence.replace(".", "")
     ratio = []
-    for i in range(len(script)):    
+    for i in range(len(script)):
+        script_sentence = script[i].replace(" ", "")
+        script_sentence = script_sentence.replace(".", "")
+    
         ratio.append(SequenceMatcher(None, present_sentence, script_sentence).ratio())
     #경험적으로, ratio() 값이 0.6 이상이면 시퀀스가 근접하게 일치함을 뜻합니다:
     if(np.max(ratio) > 0.4):
-        print('현재 대본: ', script_original[np.argmax(ratio)], np.max(ratio) ,"                                           ")
+        print('현재 대본: ', script[np.argmax(ratio)], np.max(ratio) ,"                                           ")
         return np.argmax(ratio) + present_point - 5
     else:
         print('현재 대본 : 없음                                                       ')
-        return present_point
+        return present_point    
+
     
 def similarity3(script, present_sentence, present_point):
     present_sentence = present_sentence.replace(" ", "")
-#     present_sentence = present_sentence.replace(".", "")
+    present_sentence = present_sentence.replace(".", "")
     ratio = []
-    for i in range(len(script)):    
+    for i in range(len(script)):
+        script_sentence = script[i].replace(" ", "")
+        script_sentence = script_sentence.replace(".", "")
+    
         ratio.append(SequenceMatcher(None, present_sentence, script_sentence).ratio())
     #경험적으로, ratio() 값이 0.6 이상이면 시퀀스가 근접하게 일치함을 뜻합니다:
     if(np.max(ratio) > 0.4):
         return np.argmax(ratio) + present_point - 5, np.max(ratio)
     else:
         return present_point, np.max(ratio)
+    
+def similarity4(script, present_sentence, present_point):
+    present_sentence = present_sentence.replace(" ", "")
+    present_sentence = present_sentence.replace(".", "")
+    ratio = []
+    for i in range(len(script)):
+        script_sentence = script[i].replace(" ", "")
+        script_sentence = script_sentence.replace(".", "")
+    
+        ratio.append(SequenceMatcher(None, present_sentence, script_sentence).ratio())
+    return ratio
 
 def main():
     language_code = 'ko-KR'
@@ -173,15 +215,23 @@ def main():
     streaming_config = speech.StreamingRecognitionConfig(
         config=config,
         interim_results=True)
+
+    present_point = 5
     
-    with MicrophoneStream(RATE, CHUNK) as stream:
-        audio_generator = stream.generator()
-        requests = (speech.StreamingRecognizeRequest(audio_content=content)
-                    for content in audio_generator)
+    while(True):
+        with MicrophoneStream(RATE, CHUNK) as stream:
 
-        responses = client.streaming_recognize(streaming_config, requests)
+            audio_generator = stream.generator()
 
-        listen_print_loop(responses, First = True)
+            requests = (speech.StreamingRecognizeRequest(audio_content=content)
+                        for content in audio_generator)
+                
+
+            responses = client.streaming_recognize(streaming_config, requests)
+
+            present_point = listen_print_loop(responses, present_point)
+            print("---------------------한번 끝남----------------------")
+        print("microphoneStream 끝남")
 
 if __name__ == '__main__':
     main()

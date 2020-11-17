@@ -165,6 +165,7 @@ def similarity3(script, present_sentence, present_point):
     else:
         return present_point, np.max(ratio)
 
+
 def main():
     language_code = 'ko-KR'
     client = speech.SpeechClient()

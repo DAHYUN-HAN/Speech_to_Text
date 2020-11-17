@@ -110,7 +110,11 @@ def listen_print_loop(responses, First):
 #             sys.stdout.flush()
             
             num_chars_printed = len(transcript)
-            
+        
+        with open('ratio.txt', 'a') as f:
+            f.writelines(name+"\n")
+            for line in result_list:
+                f.writelines(str(line)+'\n')
 
         else:
             #print(transcript + overwrite_chars)
@@ -128,6 +132,7 @@ def listen_print_loop(responses, First):
             
             present_sentence = transcript + overwrite_chars
             present_point = similarity2(script_data[present_point-5:present_point+6], transcript + overwrite_chars,present_point)
+            script_data[present_point] = "공백"
 
             
 def similarity(script, present_sentence, present_point):
@@ -147,9 +152,6 @@ def similarity(script, present_sentence, present_point):
     
     
 def similarity2(script, present_sentence, present_point):
-#     print('present_point', present_point)
-#     print('present_sentence', present_sentence)
-#     print('script', script)
     present_sentence = present_sentence.replace(" ", "")
     present_sentence = present_sentence.replace(".", "")
     ratio = []
@@ -159,13 +161,29 @@ def similarity2(script, present_sentence, present_point):
     
         ratio.append(SequenceMatcher(None, present_sentence, script_sentence).ratio())
     #경험적으로, ratio() 값이 0.6 이상이면 시퀀스가 근접하게 일치함을 뜻합니다:
-    print(ratio)
-    if(np.max(ratio) > 0.4):
-        print('현재 대본: ', script[np.argmax(ratio)], np.max(ratio) ,"                                           ")
-        return np.argmax(ratio) + present_point - 5
-    else:
-        print('현재 대본 : 없음                                                       ')
-        return present_point
+    
+    NEXT_STEP = False
+    
+    for i in ratio:
+        if(np.max(i) > 0.4):
+            if(not NEXT_STEP) : 
+                present = np.argmax(i)
+                present_ratio = i[present]
+            next = present+1
+            if(next == 11):
+                next = next-1
+
+            if(i[present]<i[next]*3):
+                present = next
+                present_ratio = i[present]
+                NEXT_STEP = True
+            print(present)
+            print('현재 대본: ', script[present], np.max(ratio) ,"                                           ")
+            return present + present_point - 5
+        else:
+            print('현재 대본 : 없음                                                       ')
+            return present_point
+
     
 def similarity3(script, present_sentence, present_point):
     present_sentence = present_sentence.replace(" ", "")
