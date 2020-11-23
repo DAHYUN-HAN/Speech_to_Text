@@ -26,8 +26,7 @@ def run_quickstart(test_audio):
         audio = speech.RecognitionAudio(content=content)
         config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=44100,
-        enable_word_time_offsets = True,
+#         sample_rate_hertz=16000,
         language_code="ko-KR",
     )
 
@@ -36,7 +35,6 @@ def run_quickstart(test_audio):
 
     for result in response.results:
         print('Transcript: {}'.format(result.alternatives[0].transcript))
-        print(f"start_time: {result.alternatives[0].words.start_time.seconds()}, end_time: {result.alternatives[0].words.end_time.seconds()}")
     # [END speech_quickstart]
     
 def transcribe_gcs(gcs_uri):
@@ -79,5 +77,5 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     test_audio = args.test_audio
-    transcribe_gcs(test_audio)
+    run_quickstart(test_audio)
     print("time :", time.time() - start)
