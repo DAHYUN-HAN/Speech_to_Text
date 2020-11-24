@@ -65,6 +65,8 @@ class MicrophoneStream(object):
 def listen_print_loop(responses, present_point):
     before = '/'
     cut_point = 0
+    compare_list = []
+    compare_list.append([0,0,0,0,0,0,0,0,0,0,0])
     
     start = time.time()
     
@@ -88,13 +90,12 @@ def listen_print_loop(responses, present_point):
             
         if not check:
 #             print("transcript", transcript)
-            compare_list = []
+
             now = transcript[cut_point:]
 #             print("if", present_point)
-            compare_list.append(similarity3(script_data[present_point-PADDING:present_point+PADDING+1], before))#before
             compare_list.append(similarity3(script_data[present_point-PADDING:present_point+PADDING+1], now))#now
             
-            present_point, cut_point = similarity4(compare_list, present_point, before, cut_point)
+            present_point, cut_point = similarity4(compare_list[-2:], present_point, before, cut_point)
             sys.stdout.write(print_script[present_point] +overwrite_chars +'\r')
 #             print(print_script[present_point])
             before = transcript[cut_point:]
@@ -106,6 +107,7 @@ def listen_print_loop(responses, present_point):
         else:
 #             print("-----------------------------------------------------")
             compare_list = []
+            compare_list.append([0,0,0,0,0,0,0,0,0,0,0])
             now = transcript[cut_point:]
             compare_list.append(similarity3(script_data[present_point-PADDING:present_point+PADDING+1], before))#before
             compare_list.append(similarity3(script_data[present_point-PADDING:present_point+PADDING+1], now))#now
@@ -147,12 +149,13 @@ def similarity4(compare_list, present_point, before, cut_point):
 #     print(np.argmax(compare_list[1]))
 #     print("present_point", present_point)
     if(np.max(compare_list[1]) > 0.4):
-        inner_present_point = np.argsort(compare_list[1])[-1]
+        sorting = np.argsort(compare_list[1])
+        inner_present_point = sorting[-1]
 #         print("inner_present_point", inner_present_point)
-        next = np.argsort(compare_list[1])[-2]
+        next = sorting[-2]
 
         if((compare_list[1][inner_present_point]-compare_list[0][inner_present_point] < 0 ) and (compare_list[1][next]-compare_list[0][next] > 0 )):
-            if(compare_list[1][inner_present_point] < compare_list[1][next]*2):
+            if(compare_list[1][inner_present_point] < compare_list[1][next]*2.5):
                 inner_present_point = next
                 cut_point = len(before)
                 
