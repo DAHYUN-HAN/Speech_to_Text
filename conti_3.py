@@ -63,10 +63,9 @@ class MicrophoneStream(object):
             yield b''.join(data)
 
 def listen_print_loop(responses, present_point):
-    before = '/'
+#     before = '/'
     cut_point = 0
     compare_list = []
-    compare_list.append([0,0,0,0,0,0,0,0,0,0,0])
     
     start = time.time()
     
@@ -93,7 +92,12 @@ def listen_print_loop(responses, present_point):
 
             now = transcript[cut_point:]
 #             print("if", present_point)
-            compare_list.append(similarity3(script_data[present_point-PADDING:present_point+PADDING+1], now))#now
+
+            if(len(compare_list)):
+                before = now
+                compare_list.append(similarity3(script_data[present_point-PADDING:present_point+PADDING+1], now))#now
+                
+            compare_list.append(similarity3(script_data[present_point-PADDING:present_point+PADDING+1], now))
             
             present_point, cut_point = similarity4(compare_list[-2:], present_point, before, cut_point)
             sys.stdout.write(print_script[present_point] +overwrite_chars +'\r')
