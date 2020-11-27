@@ -95,9 +95,9 @@ def listen_print_loop(responses, present_point):
 
             if(len(compare_list)):
                 before = now
-                compare_list.append(similarity3(script_data[present_point-PADDING:present_point+PADDING+1], now))#now
+                compare_list.append(similarity2(script_data[present_point-PADDING:present_point+PADDING+1], now))#now
                 
-            compare_list.append(similarity3(script_data[present_point-PADDING:present_point+PADDING+1], now))
+            compare_list.append(similarity3(script_data[present_point-PADDING:present_point+PADDING+1], now, compare_list[-1], before))
             
             present_point, cut_point = similarity4(compare_list[-2:], present_point, before, cut_point)
             sys.stdout.write(print_script[present_point] +overwrite_chars +'\r')
@@ -110,7 +110,6 @@ def listen_print_loop(responses, present_point):
 
         else:
 #             print("-----------------------------------------------------")
-            
             now = transcript[cut_point:]
             compare_list.append(similarity3(script_data[present_point-PADDING:present_point+PADDING+1], now))#now
             
@@ -122,36 +121,87 @@ def listen_print_loop(responses, present_point):
             if re.search(r'\b(exit|quit)\b', transcript, re.I):
                 print('Exiting..')
                 break
+
+            
+            present_sentence = transcript + overwrite_chars
             
             before = "/"
             cut_point = 0
-            compare_list = []
+            
 #             script_data.insert(present_point-1, ' ')
             
             if(time.time()-start > 200):
                 return present_point
     
-    
-    
-def similarity3(script, present_sentence):
+def similarity2(script, present_sentence):
     ratio = []
     present_sentence = present_sentence.replace(" ", "")
 #     print(present_sentence)
 #     print(script)
     for i in script:
         ratio.append(SequenceMatcher(None, present_sentence, i).ratio())
+    return ratio   
+    
+def similarity3(script, present_sentence, compare_list, before_sentence):
+    ratio = []
+    present_sentence = present_sentence.replace(" ", "")
+#     print(present_sentence)
+#     print(script)
+    for i in range(len(script)):
+        temp_ratio = SequenceMatcher(None, present_sentence, script[i]).ratio()
+        if(len(before_sentence) > len(present_sentecne)) :
+            if(compare_list[i] > temp_ratio):
+                temp_ratio = compare_list[i]
+        ratio.append(temp_ratio)
     return ratio
+
+def similarity4(compare_list, present_point, before, cut_point):
+    if(np.max(compare_list[1]) > 0.4):
+        sorting = np.argsort(compare_list[1])
+        inner_present_point = sorting[-1]
+        next = sorting[-2]
+
+        if((compare_list[1][inner_present_point]-compare_list[0][inner_present_point] < 0 ) and (compare_list[1][next]-compare_list[0][next] > 0 )):
+            if(compare_list[1][inner_present_point] < compare_list[1][next]*2.5):
+                inner_present_point = next
+                cut_point = len(before)
+                
+        present_point = inner_present_point + present_point - PADDING    
+    return present_point, cut_point
 
 def similarity4(compare_list, present_point, before, cut_point):
 #     print(compare_list)
 #     print(np.argmax(compare_list[0]))
 #     print(np.argmax(compare_list[1]))
 #     print("present_point", present_point)
-    if(np.max(compare_list[1]) > 0.4):
-        sorting = np.argsort(compare_list[1])
-        inner_present_point = sorting[-1]
+
+    sorting = np.argsort(compare_list[1])
+    for i in range()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    if(np.max(compare_list[1]) >= 0.4):
+        
+        
+        if(compare_list[0][sorting[-1]] < 0.2):
+            if(compare_list[1][sorting[-2]] >= 0.4):
+                inner_present_point = sorting[-2]
+                next = sorting[-3]
+            else:
+                return present_point, cut_point
+        else:
+            inner_present_point = sorting[-1]
+            next = sorting[-2]
 #         print("inner_present_point", inner_present_point)
-        next = sorting[-2]
+        
 
         if((compare_list[1][inner_present_point]-compare_list[0][inner_present_point] < 0 ) and (compare_list[1][next]-compare_list[0][next] > 0 )):
             if(compare_list[1][inner_present_point] < compare_list[1][next]*2.5):
