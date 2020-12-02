@@ -21,6 +21,7 @@ Example usage:
 
 import argparse
 import numpy as np
+import pandas as pd
 
 # [START speech_transcribe_streaming]
 def transcribe_streaming(stream_file):
@@ -29,49 +30,64 @@ def transcribe_streaming(stream_file):
     from google.cloud import speech
 
     client = speech.SpeechClient()
-
+    
+    with open('jitter.txt', 'r') as f:
+        data = f.read()
+    jitter = data.splitlines()
+    jitter = np.array(jitter, np.int16)
+    ratio = 0.05
+    jitter = ratio*jitter
+    jitter = jitter.astype(np.int16)
+    
     # [START speech_python_migration_streaming_request]
     with io.open(stream_file, "rb") as audio_file:
         content = audio_file.read()
         
     with io.open('pause2.wav', "rb") as audio_file:
         pause = audio_file.read()
-
+    
+    content2 = np.frombuffer(content, np.int16)
+    pause2 = np.frombuffer(pause, np.int16)
+    print(len(content2), len(pause2))
     # In practice, stream should be a generator yielding chunks of audio data.
     stream = [content]    
     print(len(stream[0]))
     for chunk in stream:
         a = np.frombuffer(chunk, np.int16)
     
-#     x = 0
-#     sum = 0
-#     count = 0
-#     check = True
-#     new_content = content
-#     stream = [content]
-# #     print(len(a))
-#     for i in range(len(a)-22):
-#         index = i + 22
-#         if(abs(a[index]) < 1000) :
-#             sum = sum + 1
-#             if(sum > 8000):
-#                 if(check):
-#                     check = False
+    x = 0
+    sum = 0
+    count = 0
+    check = True
+    new_content = content2
+    
+    for i in range(len(content2)):
+        if(abs(content2[i]) < 1000) :
+            sum = sum + 1
+            if(sum > 8000):
+                if(check):
+                    check = False
 #                     print(i)
 #                     point = (index-11)*2 + (24000*count)
 #                     new_content = new_content[44:point] + (new_content[point-8000:point]*3) + new_content[point:len(new_content)]
-#                     count = count +1
+#                     point = (index-11)*2 + (len(pause[44:])*count)
+#                     new_content = new_content[44:point] + pause[44:] + new_content[point:len(new_content)]
+
+                    point = i + (len(pause2[44:])*count)
+                    new_content = np.concatenate((new_content[44:point], pause2[44:], new_content[point:]), axis=0)
+                    count = count +1
                               
-#         else:
-#             sum = 0
-#             check = True
-# #         with open('kkk.txt', 'a') as f:
-# #             f.writelines(str(sum)+'\n')
+        else:
+            sum = 0
+            check = True
+#         with open('kkk.txt', 'a') as f:
+#             f.writelines(str(sum)+'\n')
     
-#     print(len(stream[0]))
-#     content = new_content
+    
+    
+    new_content = new_content + jitter[:len(new_content)]
+    content = new_content.tobytes()
     stream = [content]
-    print(len(stream[0]))
     for chunk in stream:
         a = np.frombuffer(chunk, np.int16)
         with open('a.txt', 'w') as f:

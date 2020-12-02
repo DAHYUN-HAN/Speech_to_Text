@@ -3,6 +3,7 @@ import io
 import os
 import time
 
+
 def run_quickstart(test_audio):
     # [START speech_quickstart]
 
