@@ -177,11 +177,11 @@ def main():
     
     global script_data, print_script
     
-    with open('conti_script_compare.txt', 'r') as f:
+    with open('conti/conti_script_compare.txt', 'r') as f:
         data = f.read()
     script_data = data.splitlines()
     
-    with open('conti_script_print.txt', 'r') as f:
+    with open('conti/conti_script_print.txt', 'r') as f:
         data = f.read()
     print_script = data.splitlines()
     
@@ -189,8 +189,15 @@ def main():
     while(True):
         with MicrophoneStream(RATE, CHUNK) as stream:
             audio_generator = stream.generator()
+            
             requests = (speech.StreamingRecognizeRequest(audio_content=content)
                         for content in audio_generator)
+            
+            for content in audio_generator:
+                a = np.frombuffer(content, np.int16)
+                with open('a.txt', 'a') as f:
+                    for line in a:
+                        f.writelines(str(line)+'\n')
 
             responses = client.streaming_recognize(streaming_config, requests)
             present_point = listen_print_loop(responses, present_point)

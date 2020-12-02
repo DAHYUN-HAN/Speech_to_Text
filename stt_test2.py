@@ -34,7 +34,7 @@ def run_quickstart(test_audio):
     response = client.recognize(config=config, audio=audio)
 
     for result in response.results:
-        print('{}'.format(result.alternatives[0].transcript))
+        print('Transcript: {}'.format(result.alternatives[0].transcript))
     # [END speech_quickstart]
     
 def transcribe_gcs(gcs_uri):
@@ -77,11 +77,9 @@ if __name__ == '__main__':
     
 #     args = parser.parse_args()
 #     test_audio = args.test_audio
-    dir1 = 'capture/split2/0.1secs/'
+    dir1 = 'pause_test/폴더/'
     files = os.listdir(dir1)
     for f in files:
-        files2 = os.listdir(dir1+f)
         print(f)
-        for f2 in files2:
-            run_quickstart(dir1+f+'/'+f2)
+        run_quickstart(dir1+f)
 #     print("time :", time.time() - start)

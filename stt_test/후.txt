@@ -1,0 +1,136 @@
+Finished: True
+Stability: 0.0
+Confidence: 0.7261144518852234
+Transcript: 다음 날 같은 공간
+Finished: True
+Stability: 0.0
+Confidence: 0.9104483127593994
+Transcript:  하 이번에 떨어지면 엄마 얼굴 어떻게 보지
+Finished: True
+Stability: 0.0
+Confidence: 0.9007152915000916
+Transcript:  그날 오후에 있는 알바 좀 치워 탈락통보 문자를 받고 설상가상 손님에게 컴플레인이 들어와 사장에게 갖은 욕을  듣는다
+Finished: True
+Stability: 0.0
+Confidence: 0.9098506569862366
+Transcript:  이걸로 27 번째인가
+Finished: True
+Stability: 0.0
+Confidence: 0.6232556104660034
+Transcript:  내 나이만큼 과연네
+Finished: True
+Stability: 0.0
+Confidence: 0.6679713129997253
+Transcript:  그날 저녁 a 와 b는 방 앞에서 마주친다
+Finished: True
+Stability: 0.0
+Confidence: 0.9213447570800781
+Transcript:  휴
+Finished: True
+Stability: 0.0
+Confidence: 0.8192163109779358
+Transcript:  삼정 같은 날 자전거 고시원 옥상
+Finished: True
+Stability: 0.0
+Confidence: 0.8719680309295654
+Transcript:  여기서부터는 수정된 부분이니 대본 들고 해 보자
+Finished: True
+Stability: 0.0
+Confidence: 0.880031406879425
+Transcript:  저기요 지금 뛰어내리려는 거예요
+Finished: True
+Stability: 0.0
+Confidence: 0.6168391108512878
+Transcript:  말리지 마요
+Finished: True
+Stability: 0.0
+Confidence: 0.7281016707420349
+Transcript:  그래도 소용 없어요
+Finished: True
+Stability: 0.0
+Confidence: 0.8594238758087158
+Transcript:  아니 말리려는게 아니고 제가 먼저 뛰어내리면 안될까요
+Finished: True
+Stability: 0.0
+Confidence: 0.9236595630645752
+Transcript:  뭐라고요
+Finished: True
+Stability: 0.0
+Confidence: 0.9210342168807983
+Transcript:  저도 정말 힘들게 오늘 죽기로 마음 먹었거든요
+Finished: True
+Stability: 0.0
+Confidence: 0.9185425639152527
+Transcript:  지금 아니면 못 할 거 같은데
+Finished: True
+Stability: 0.0
+Confidence: 0.7554949522018433
+Transcript:  제가 먼저 뛴 다음에 뜨시면 안 될까요
+Finished: True
+Stability: 0.0
+Confidence: 0.8163118958473206
+Transcript:  아 그럼 저더러 죽기 전에 그 쪽 주는 거 먼저 보라고요
+Finished: True
+Stability: 0.0
+Confidence: 0.9112368822097778
+Transcript:  죄송해요 그쪽이 먼저 죽으면 소란스러워 지잖아요
+Finished: True
+Stability: 0.0
+Confidence: 0.9236595034599304
+Transcript:  전 조용히 죽고 싶거든요
+Finished: True
+Stability: 0.0
+Confidence: 0.9236595034599304
+Transcript:  너무 이기적인 거 아니에요
+Finished: True
+Stability: 0.0
+Confidence: 0.9235737919807434
+Transcript:  전 평생을 남 눈치만 보면서 살았어요
+Finished: True
+Stability: 0.0
+Confidence: 0.7055473327636719
+Transcript:  죽을 때 만이라도 좀 이기적이면 안되나요
+Finished: True
+Stability: 0.0
+Confidence: 0.8688462972640991
+Transcript:  저는요 다른 인간들한테 밀리기만 하면서 살아 왔어요
+Finished: True
+Stability: 0.0
+Confidence: 0.9236595034599304
+Transcript:  죽는 것까지 밀릴 수는 없잖아요
+Finished: True
+Stability: 0.0
+Confidence: 0.9236595034599304
+Transcript:  그럼 이렇게 하는 거 어때요
+Finished: True
+Stability: 0.0
+Confidence: 0.8061883449554443
+Transcript:  누가 먼저 죽을 만한지 서로 이야기 들어보고 정하기로
+Finished: True
+Stability: 0.0
+Confidence: 0.9236595630645752
+Transcript:  그래요
+Finished: True
+Stability: 0.0
+Confidence: 0.9236595630645752
+Transcript:  어때
+Finished: True
+Stability: 0.0
+Confidence: 0.8921995162963867
+Transcript:  주제도 명확하고 난 좋아이 방향으로 공연 기획 안자고 예산도 짜 볼게 연습은 더 해야겠지
+Finished: True
+Stability: 0.0
+Confidence: 0.8770114779472351
+Transcript:  난 시장 조사하러 갈게
+Finished: True
+Stability: 0.0
+Confidence: 0.9236595630645752
+Transcript:  나도 갈게
+Finished: True
+Stability: 0.0
+Confidence: 0.9236595034599304
+Transcript:  넌 왜 같이가
+Finished: True
+Stability: 0.0
+Confidence: 0.9236594438552856
+Transcript:  기획안을 쓰려면 예산을 정확하게 잡아야지 안 그래
