@@ -43,11 +43,12 @@ def transcribe_streaming(stream_file):
     with io.open(stream_file, "rb") as audio_file:
         content = audio_file.read()
         
-    with io.open('pause2.wav', "rb") as audio_file:
+    with io.open('pause4.wav', "rb") as audio_file:
         pause = audio_file.read()
     
     content2 = np.frombuffer(content, np.int16)
     pause2 = np.frombuffer(pause, np.int16)
+    print(pause2)
     print(len(content2), len(pause2))
     # In practice, stream should be a generator yielding chunks of audio data.
     stream = [content]    
@@ -55,7 +56,7 @@ def transcribe_streaming(stream_file):
     for chunk in stream:
         a = np.frombuffer(chunk, np.int16)
     
-    x = 0
+    
     sum = 0
     count = 0
     check = True
@@ -84,7 +85,8 @@ def transcribe_streaming(stream_file):
 #             f.writelines(str(sum)+'\n')
     
     
-    
+    print(len(new_content))
+    print(len(jitter))
     new_content = new_content + jitter[:len(new_content)]
     content = new_content.tobytes()
     stream = [content]

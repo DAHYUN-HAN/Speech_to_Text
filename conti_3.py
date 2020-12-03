@@ -7,6 +7,7 @@ import sys
 import pyaudio
 import numpy as np
 import time
+import io
 
 RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
@@ -45,6 +46,15 @@ class MicrophoneStream(object):
         return None, pyaudio.paContinue
 
     def generator(self):
+
+        sum = 0
+        count = 0
+        check = True
+        
+        with io.open('stt_test/pause4.wav', "rb") as audio_file:
+            blank = audio_file.read()
+        blank = blank[44:]
+        
         while not self.closed:
             chunk = self._buff.get()
             if chunk is None:
@@ -59,10 +69,27 @@ class MicrophoneStream(object):
                     data.append(chunk)
                 except queue.Empty:
                     break
+            
+            
+            a = np.frombuffer(chunk, np.int16)
+                    
+            for i in range(len(a)):
+                with open('b.txt', 'a') as f:
+                    f.writelines(str(sum)+'\n')
+                if(abs(a[i]) < silence) :
+                    sum = sum + 1
+                    if(sum > 8000):
+                        if(check):
+                            check = False
+                            data.append(blank)
+                else:
+                    sum = 0
+                    check = True
 
             yield b''.join(data)
 
 def listen_print_loop(responses, present_point):
+    print("print_loop")
 #     before = '/'
     cut_point = 0
     compare_list = []
@@ -177,27 +204,61 @@ def main():
     
     global script_data, print_script
     
-    with open('conti/conti_script_compare.txt', 'r') as f:
+    with open('conti_script_compare.txt', 'r') as f:
         data = f.read()
     script_data = data.splitlines()
     
-    with open('conti/conti_script_print.txt', 'r') as f:
+    with open('conti_script_print.txt', 'r') as f:
         data = f.read()
     print_script = data.splitlines()
     
+    audio = pyaudio.PyAudio()
+    stream = audio.open(format=pyaudio.paInt16, channels=1, rate=RATE, input=True, frames_per_buffer=CHUNK)
+    blank = []
+    normal = False
+    print("환경 설정 중 2초 동안 무음을 유지해주세요")
+    silence_list = []
+    for i in range(0, int(RATE / CHUNK * 2)):
+        sys.stdout.write(str(int((20-(i+1))/10)+1) +'  \r')
+        data = stream.read(CHUNK)
+        blank.append((data))
+    print("완료")
+
+    stream.stop_stream()
+    stream.close()
+    audio.terminate()
+    
+    blank = b''.join(blank)
+    blank = np.frombuffer(blank, np.int16)
+    print(len(blank))
+    global silence
+    silence = np.max(blank[16000:])
+
+    print(silence)
+    
+    if(silence < 500):
+        silence = 500
+        
+#     with open('c.txt', 'w') as f:
+#         for line in blank:
+#             f.writelines(str(line)+'\n')
+#     with open('d.txt', 'w') as f:
+#         for line in blank2:
+#             f.writelines(str(line)+'\n')
+
     
     while(True):
         with MicrophoneStream(RATE, CHUNK) as stream:
             audio_generator = stream.generator()
-            
             requests = (speech.StreamingRecognizeRequest(audio_content=content)
                         for content in audio_generator)
             
-            for content in audio_generator:
-                a = np.frombuffer(content, np.int16)
-                with open('a.txt', 'a') as f:
-                    for line in a:
-                        f.writelines(str(line)+'\n')
+#             for content in audio_generator:
+#                 a = np.frombuffer(content, np.int16)
+#                 with open('a.txt', 'a') as f:
+#                     for line in a:
+#                         f.writelines(str(line)+'\n')
+
 
             responses = client.streaming_recognize(streaming_config, requests)
             present_point = listen_print_loop(responses, present_point)
