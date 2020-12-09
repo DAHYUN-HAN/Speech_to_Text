@@ -9,9 +9,13 @@ from difflib import SequenceMatcher
 import shutil
 import os
 import sys
+import wave
+import soundfile as sf
+import librosa
 
 input_audio = ("audio/input_audio/")
 output_audio = ("audio/output_audio/")
+
 
 def transcribe_streaming(stream):
     client = speech.SpeechClient()
@@ -24,6 +28,7 @@ def transcribe_streaming(stream):
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
         sample_rate_hertz=16000,
         language_code="ko-KR",
+        enable_word_time_offsets=True,
     )
 
     streaming_config = speech.StreamingRecognitionConfig(config=config)
@@ -36,29 +41,99 @@ def transcribe_streaming(stream):
     return responses
                 
 def get_result(responses, present_point):
-    
+    global before, input_audio_list, word_list, file_name
+    word_list = []
+    ratio_list = []
+    ratio_list.append(0.0)
+    start_time_list = []
+    end_time_list = []
+    final_time_list = []
+    i = 1
     for response in responses:
         for result in response.results:
-            alternatives = result.alternatives
-            for alternative in alternatives:
-                transcript = alternative.transcript
-                present_point = similarity(script_data[present_point-5:present_point+5], transcript,present_point)
-                print(print_script[present_point])
+            
+            #단어별 시간 출력
+            alternative = result.alternatives[0]
+#             print("for 바깥")
+            for word_info in alternative.words:
+                word = word_info.word
+                word_list.append(word)
+                start_time = word_info.start_time
+                end_time = word_info.end_time
+                    
+                start_time_list.append(start_time.total_seconds())
+                end_time_list.append(end_time.total_seconds())
                 
-    return present_point
+#                 print(
+#                     f"Word: {word}, start_time: {start_time.total_seconds()}, end_time: {end_time.total_seconds()}"
+#                 )
+                max_point, ratio = similarity(script_data[present_point-1:present_point+10], present_point)
+                ratio_list.append(ratio)
+#                 print(word_list)
+#                 print(ratio_list[-1])
+                if(ratio > 0.3):
+                    if(ratio_list[-1] == 1):
+                        present_point = max_point + present_point -1
+                        ratio_list = []
+                        ratio_list.append(0.0)
+                        word_list = []
+                        final_time_list.append(start_time_list[0])
+                        
+                        start_time_list = []
+                        
+                        print(present_point, print_script[present_point])
+                        with open('final/txt/' + file_name[:-4] + "_" + str(i) + ".txt", 'w') as f:
+                            f.writelines(print_script[present_point]+'\n')
+                        i = i +1
+                    elif(ratio_list[-1] < ratio_list[-2]):
+                        present_point = max_point + present_point -1
+                        ratio_list = []
+                        ratio_list.append(0.0)
+                        last = word_list[-1]
+                        word_list = []
+                        word_list.append(last)
+                        final_time_list.append(start_time_list[0])
+                        temp_start = start_time_list[-1]
+                        start_time_list = []
+                        start_time_list.append(temp_start)
+                       
+                        print(present_point, print_script[present_point])
+                        with open('final/txt/' + file_name[:-4] + "_" + str(i) + ".txt", 'w') as f:
+                            f.writelines(print_script[present_point]+'\n')
+                        i = i +1
+                    
+                
+#             #대본 비교    
+#             alternatives = result.alternatives
+#             for alternative in alternatives:
+#                 transcript = alternative.transcript
+#                 present_point = similarity(script_data[present_point-5:present_point+5], transcript,present_point)
+#                 if(present_point != before):
+#                     print(print_script[present_point])
+                    
+#                     #대본 저장
+#                     f = open("txt/"+ input_audio_list[0][:-4] + "_" + str(i) + ".txt", 'w')
+#                     f.write(print_script[present_point])
+#                     f.close()
+#                     i = i+1
 
-def similarity(script, present_sentence, present_point):
-    present_sentence = present_sentence.replace(" ", "")
-    present_sentence = present_sentence.replace(".", "")
+#                 before = present_point
+    print(final_time_list)
+    return present_point, final_time_list
+
+def similarity(script, present_point):
+    global word_list
+    present_sentence = ''.join(word_list)
     ratio = []
     for i in range(len(script)):
         script_sentence = script[i]
     
         ratio.append(SequenceMatcher(None, present_sentence, script_sentence).ratio())
-    if(np.max(ratio) > 0.4):
-        return np.argmax(ratio) + present_point - 5
-    else:
-        return present_point
+    return np.argmax(ratio), np.max(ratio)
+#     if(np.max(ratio) > 0.6):
+#         return np.argmax(ratio) + present_point - 1
+#     else:
+#         return present_point
                 
                 
 def setting():
@@ -85,6 +160,7 @@ def setting():
     return script_data, print_script, jitter, blank
 
 def get_audio(audio):
+    global file_name
     with io.open(audio, "rb") as audio_file:
         byte_content = audio_file.read()
     
@@ -109,35 +185,47 @@ def get_audio(audio):
         else:
             sum = 0
             check = True
+    print(count)
     
-    new_content = new_content + jitter[:len(new_content)]
-    byte_content = new_content.tobytes()
-    return [byte_content]
+    sf.write("audio/blank_ver/blank_ver_" + file_name, new_content, 16000, subtype='PCM_16')
+    new_content_jitter_ver = new_content + jitter[:len(new_content)]
+    byte_content = new_content_jitter_ver.tobytes()
+        
+    
+    return [byte_content], new_content
 
 def predict(audio, present_point):
-    stream = get_audio(input_audio + audio)
+    stream, new_content = get_audio(input_audio + audio)
     
     responses = transcribe_streaming(stream)
     
-    present_point = get_result(responses, present_point)
+    present_point, final_time_list = get_result(responses, present_point)
+    
+    for i in range(len(final_time_list)):
+        if(i==len(final_time_list)-1):
+            sf.write("final/audio/" + file_name[:-4] + "_" + str(i+1) + ".wav", new_content[int(float(final_time_list[i])*16000):len(new_content)], 16000, subtype='PCM_16')
+        else:
+            sf.write("final/audio/" + file_name[:-4] + "_" + str(i+1) + ".wav", new_content[int(float(final_time_list[i])*16000):int(float(final_time_list[i+1])*16000)], 16000, subtype='PCM_16')
+        
     move_file(audio)
+        
     return present_point
 
 def move_file(audio):
     shutil.move(input_audio+audio, output_audio + audio)
     
 def main():
-    global script_data, print_script, jitter, blank
+    global script_data, print_script, jitter, blank, before, input_audio_list, file_name
     script_data, print_script, jitter, blank = setting()
-    
-    present_point = 5
+    before = 0
+    present_point = 1
     while True:
         try:
             input_audio_list = os.listdir(input_audio)
 
             if(len(input_audio_list)):
-                
-                present_point = predict(input_audio_list[0], present_point)
+                file_name = input_audio_list[0]
+                present_point = predict(file_name, present_point)
 
         except KeyboardInterrupt:
             print("종료")
